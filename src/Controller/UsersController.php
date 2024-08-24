@@ -24,7 +24,7 @@ class UsersController extends AppController
         $result = $this->Authentication->getResult();
         // regardless of POST or GET, redirect if user is logged in
         if ($result && $result->isValid()) {
-            // redirect to /home after login success
+            $this->Flash->success(__('Bienvenido'));
             $redirect = $this->request->getQuery('redirect', [
                 'controller' => 'Home',//pendiente
                 'action' => 'index',

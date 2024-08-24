@@ -5,6 +5,7 @@ namespace App\Model\Entity;
 
 use Authentication\PasswordHasher\DefaultPasswordHasher;
 use Cake\ORM\Entity;
+use Cake\ORM\TableRegistry;
 
 /**
  * User Entity
@@ -29,10 +30,6 @@ class User extends Entity
     /**
      * Fields that can be mass assigned using newEntity() or patchEntity().
      *
-     * Note that when '*' is set to true, this allows all unspecified fields to
-     * be mass assigned. For security purposes, it is advised to set '*' to false
-     * (or remove it), and explicitly make individual fields accessible as needed.
-     *
      * @var array<string, bool>
      */
     protected array $_accessible = [
@@ -50,19 +47,41 @@ class User extends Entity
         'status' => true,
     ];
 
+    protected array $_virtual = ['role_name', 'status_name'];
+
     /**
      * Fields that are excluded from JSON versions of the entity.
      *
-     * @var list<string>
+     * @var array<string>
      */
     protected array $_hidden = [
         'password',
     ];
 
-    protected function _setPassword(string $password) : ?string
+    protected function _setPassword(string $password): ?string
     {
         if (strlen($password) > 0) {
             return (new DefaultPasswordHasher())->hash($password);
+        }
+        return null;
+    }
+
+    protected function _getRoleName(): ?string
+    {
+        if (isset($this->role_id)) {
+            $rolesTable = TableRegistry::getTableLocator()->get('Roles');
+            $role = $rolesTable->get($this->role_id);
+            return $role ? $role->name : null;
+        }
+        return null;
+    }
+
+    protected function _getStatusName(): ?string
+    {
+        if (isset($this->status_id)) {
+            $statusesTable = TableRegistry::getTableLocator()->get('Statuses');
+            $status = $statusesTable->get($this->status_id);
+            return $status ? $status->name : null;
         }
         return null;
     }
