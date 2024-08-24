@@ -27,13 +27,20 @@ use Cake\Http\MiddlewareQueue;
 use Cake\ORM\Locator\TableLocator;
 use Cake\Routing\Middleware\AssetMiddleware;
 use Cake\Routing\Middleware\RoutingMiddleware;
-
+//Authentication
 use Authentication\AuthenticationService;
 use Authentication\AuthenticationServiceInterface;
 use Authentication\AuthenticationServiceProviderInterface;
 use Authentication\Middleware\AuthenticationMiddleware;
 use Cake\Routing\Router;
 use Psr\Http\Message\ServerRequestInterface;
+//Authorization
+use Authorization\AuthorizationService;
+use Authorization\AuthorizationServiceInterface;
+use Authorization\AuthorizationServiceProviderInterface;
+use Authorization\Middleware\AuthorizationMiddleware;
+use Authorization\Policy\OrmResolver;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Application setup class.
@@ -43,7 +50,7 @@ use Psr\Http\Message\ServerRequestInterface;
  *
  * @extends \Cake\Http\BaseApplication<\App\Application>
  */
-class Application extends BaseApplication implements AuthenticationServiceProviderInterface
+class Application extends BaseApplication implements AuthenticationServiceProviderInterface, AuthorizationServiceProviderInterface
 {
     /**
      * Load all the application configuration and bootstrap logic.
@@ -54,6 +61,9 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
     {
         // Call parent to load bootstrap from files.
         parent::bootstrap();
+
+        // Add the Authorization plugin
+        $this->addPlugin('Authorization');
 
         if (PHP_SAPI !== 'cli') {
             FactoryLocator::add(
@@ -98,7 +108,10 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
                 'httponly' => true,
             ]))
             // Add the AuthenticationMiddleware. It should be after routing and body parser.
-            ->add(new AuthenticationMiddleware($this));
+            ->add(new AuthenticationMiddleware($this))
+            // Add the AuthorizationMiddleware *after* routing, body parser
+            // and authentication middleware.
+            ->add(new AuthorizationMiddleware($this));
         return $middlewareQueue;
     }
 
@@ -140,5 +153,12 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
         ]);
 
         return $authenticationService;
+    }
+
+    public function getAuthorizationService(ServerRequestInterface $request): AuthorizationServiceInterface
+    {
+        $resolver = new OrmResolver();
+
+        return new AuthorizationService($resolver);
     }
 }
