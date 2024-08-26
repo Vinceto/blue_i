@@ -27,6 +27,9 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
         <?php if ($this->request->getSession()->read('Auth.username') 
                 && $this->request->getSession()->read('Auth.role_name') !== null
                 && $this->request->getSession()->read('Auth.status_name') !== null): ?>
+                <a href="<?= $this->Url->build(['controller' => 'Users', 'action' => 'index']) ?>">Users</a>
+                <a href="<?= $this->Url->build(['controller' => 'Roles', 'action' => 'index']) ?>">Roles</a>
+                <a href="<?= $this->Url->build(['controller' => 'Statuses', 'action' => 'index']) ?>">Statuses</a>
                 <a target="_blank" rel="noopener" href="https://book.cakephp.org/5/">Documentation</a>
                 <a target="_blank" rel="noopener" href="https://api.cakephp.org/">API</a>
                 <span>Welcome, <?= $this->request->getSession()->read('Auth.username'); ?></span>
