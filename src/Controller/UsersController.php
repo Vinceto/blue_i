@@ -110,12 +110,13 @@ class UsersController extends AppController
         $user = $this->Users->get($id, contain: []);
         if ($this->request->is(['patch', 'post', 'put'])) {
             $user = $this->Users->patchEntity($user, $this->request->getData());
+            $user->updated_at = new \Cake\I18n\FrozenTime();
             if ($this->Users->save($user)) {
-                $this->Flash->success(__('The user has been saved.'));
+                $this->Flash->success(__('El usuario fue modificado.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The user could not be saved. Please, try again.'));
+            $this->Flash->error(__('No se puede modificar el usuario. Por favor, intente nuevamente.'));
         }
         $roles = $this->Users->Roles->find('list', limit: 200)->all();
         $statuses = $this->Users->Statuses->find('list', limit: 200)->all();

@@ -50,6 +50,13 @@ class UsersTable extends Table
         $this->belongsTo('Statuses', [
             'foreignKey' => 'status_id',
         ]);
+        $this->addBehavior('Timestamp', [
+            'events' => [
+                'Model.beforeSave' => [
+                    'updated_at' => 'always',
+                ],
+            ],
+        ]);
     }
 
     /**

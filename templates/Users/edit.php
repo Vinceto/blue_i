@@ -31,9 +31,9 @@
                     echo $this->Form->control('last_name');
                     echo $this->Form->control('role_id', ['options' => $roles, 'empty' => true]);
                     echo $this->Form->control('status_id', ['options' => $statuses, 'empty' => true]);
-                    echo $this->Form->control('created_at');
-                    echo $this->Form->control('updated_at', ['empty' => true]);
-                    echo $this->Form->control('deleted_at', ['empty' => true]);
+                    echo $this->Form->control('created_at', ['type' => 'hidden']);
+                    echo $this->Form->control('updated_at', ['type' => 'hidden'], ['value' => date('Y-m-d H:i:s')]);
+                    echo $this->Form->control('deleted_at', ['type' => 'hidden']);
                 ?>
             </fieldset>
             <?= $this->Form->button(__('Submit')) ?>
