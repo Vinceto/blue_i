@@ -1,5 +1,5 @@
 <?php
-$cakeDescription = 'CakePHP: the rapid development php framework';
+$cakeDescription = 'Bluei, by IDIEM';
 ?>
 <!DOCTYPE html>
 <html>
@@ -21,9 +21,12 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
 <body>
     <nav class="top-nav">
         <div class="top-nav-title">
-            <a href="<?= $this->Url->build('/') ?>"><span>Cake</span>PHP</a>
+            <a href="<?= $this->Url->build('/home') ?>"><span>Cake</span>PHP</a>
         </div>
         <div class="top-nav-links">
+        <!-- <?= var_dump($this->request->getSession()->read('Auth.username')); ?>
+        <?= var_dump($this->request->getSession()->read('Auth.role_name')); ?>
+        <?= var_dump($this->request->getSession()->read('Auth.status_name')); ?> -->
         <?php if ($this->request->getSession()->read('Auth.username') 
                 && $this->request->getSession()->read('Auth.role_name') !== null
                 && $this->request->getSession()->read('Auth.status_name') !== null): ?>
@@ -42,16 +45,21 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
     </nav>
     <main class="main">
         <div class="container">
-            <!-- <?php debug($this->request->getSession()->read('Auth')); ?>
+            <!-- 
             <?php debug($this->request->getSession()->read('Auth.username')); ?>
             <?php debug($this->request->getSession()->read('Auth.role_name'));?>
-            <?php debug($this->request->getSession()->read('Auth.status_name'));?> -->
+            <?php debug($this->request->getSession()->read('Auth.status_name'));?> 
+            -->
             
             <?= $this->Flash->render() ?>
+            <div id="flash-message" style="display: none;"></div>
             <?= $this->fetch('content') ?>
         </div>
     </main>
     <footer>
     </footer>
+
+    <script src="/webroot/js/flashRender.js"></script>
+
 </body>
 </html>
