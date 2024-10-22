@@ -335,22 +335,22 @@ return [
         ],
 
         // Conexión a intranet IDIEM local
-        'dynamic' => [
-            'className' => 'Cake\Database\Connection',
-            'driver' => 'Cake\Database\Driver\Mysql',
-            'persistent' => false,
-            'host' => '172.17.83.15',  // Servidor de la base de datos
-            'username' => 'DevDBAIntranet',
-            'password' => 'nXBXTCwxsen4t32W',
-            'database' => '',  // Aquí se asignará dinámicamente la base de datos
-            'encoding' => 'utf8mb4',
-            'timezone' => 'UTC',
-            'flags' => [],
-            'cacheMetadata' => true,
-            'log' => false,
-            'quoteIdentifiers' => false,
-            'url' => env('DATABASE_URL_LOCAL', null),
-    ],
+        // 'dynamic' => [
+        //     'className' => 'Cake\Database\Connection',
+        //     'driver' => 'Cake\Database\Driver\Mysql',
+        //     'persistent' => false,
+        //     'host' => '172.17.83.15',  // Servidor de la base de datos
+        //     'username' => 'DevDBAIntranet',
+        //     'password' => 'nXBXTCwxsen4t32W',
+        //     'database' => '',  // Aquí se asignará dinámicamente la base de datos
+        //     'encoding' => 'utf8mb4',
+        //     'timezone' => 'UTC',
+        //     'flags' => [],
+        //     'cacheMetadata' => true,
+        //     'log' => false,
+        //     'quoteIdentifiers' => false,
+        //     'url' => env('DATABASE_URL_LOCAL', null),
+        // ],
     ],
 
     /*

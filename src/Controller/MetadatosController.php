@@ -31,7 +31,7 @@ class MetadatosController extends AppController
         $this->set(compact('metadatos'));
 
         // Llamar a operarConDatos
-        $data = $this->operarConDatos('IDIEM_FIRMA', 'METADATOS');
+        $data = $this->obtenerMetadatosIntranetIdiem();
 
         // Si no hay datos, la variable $data será null y no se mostrará nada
         if ($data === null) {
@@ -116,28 +116,36 @@ class MetadatosController extends AppController
         return $this->redirect(['action' => 'index']);
     }
 
-    public function operarConDatos($database = 'IDIEM_FIRMA', $table = 'METADATOS', $customQuery = null)
-{
-    try {
-        // Usar el componente para ejecutar la consulta
-        $results = $this->DynamicDatabase->executeQuery($database, $table, $customQuery);
+    public function obtenerMetadatosIntranetIdiem()
+    {
+        try {
+            // Inicializar la base de datos y tabla
+            $database = 'IDIEM_FIRMA';
+            $table = 'METADATOS';
+            $group_id = 'idiem.hormigones.muestreo.laboratorio';//debe cargarse dinamicamente despues
+            $bindValues = ['MET_OBR_GRU_ID' => $group_id];
 
-        // Validar si no se encontraron resultados
-        if (empty($results)) {
-            $this->Flash->warning(__('No se encontraron datos en la tabla: ' . $table));
+            // Ejecutar la consulta a través del componente DynamicDatabase
+            $results = $this->DynamicDatabase->executeQuery($database, $table, $bindValues);
+
+            // Verificar si hay resultados
+            if (empty($results)) {
+                $this->Flash->warning(__('No se encontraron datos en la tabla: ' . $table));
+                return null;
+            }
+
+            // Pasar los resultados a la vista
+            $this->set(compact('results'));
+            return $results;
+
+        } catch (NotFoundException $e) {
+            $this->Flash->error(__('Error: ' . $e->getMessage()));
+            return null; // No redirigir, solo retornar null
+        } catch (Exception $e) {
+            $this->Flash->error(__('Ocurrió un error inesperado: ' . $e->getMessage()));
             return null; // No redirigir, solo retornar null
         }
-
-        // Enviar los resultados a la vista
-        $this->set(compact('results'));
-        return $results; // Retornar los resultados si todo está bien
-    } catch (NotFoundException $e) {
-        $this->Flash->error(__('Error: ' . $e->getMessage()));
-        return null; // No redirigir, solo retornar null
-    } catch (Exception $e) {
-        $this->Flash->error(__('Ocurrió un error inesperado: ' . $e->getMessage()));
-        return null; // No redirigir, solo retornar null
     }
-}
+
 
 }
