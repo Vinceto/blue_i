@@ -47,6 +47,13 @@ class DynamicDatabaseComponent extends Component
         }
     }
 
+    /*
+        ejemplos de bind values:
+         ['MET_OBR_GRU_ID', 'LIKE', $group_id]
+        ,['OTRA_COLUMNA', '=', 'valor_a_comparar']
+        ,['COLUMN_IN', 'IN', ['value1', 'value2', 'value3']] // Ejemplo de uso de IN
+        ,['COLUMN_BETWEEN', 'BETWEEN', ['valor_inferior', 'valor_superior']], // Ejemplo de uso de BETWEEN
+    */
     public function executeQuery($database, $table, $bindValues = [])
     {
         // Conectar a la base de datos especificada
@@ -57,12 +64,54 @@ class DynamicDatabaseComponent extends Component
 
         // Agregar las condiciones de los parámetros dinámicamente
         $params = [];
-        foreach ($bindValues as $key => $value) {
-            // Usar 'LIKE' o '=' según tus necesidades
-            $query .= " AND " . $key . " LIKE ?";
-            $params[] = $value . '%'; // Agregar el valor para el binding
+        if (!empty($bindValues)) {
+            foreach ($bindValues as $criteria) {
+                // Cada $criteria debería ser un array con ['column', 'operator', 'value']
+                list($column, $operator, $value) = $criteria;
+                
+                switch ($operator) {
+                    case 'LIKE':
+                        $query .= " AND " . $column . " LIKE ?";
+                        $params[] = $value . '%'; // Para LIKE, puedes agregar '%' o no dependiendo del uso
+                        break;
+                    case 'NOT LIKE':
+                        $query .= " AND " . $column . " NOT LIKE ?";
+                        $params[] = $value . '%';
+                        break;
+                    case '=':
+                        $query .= " AND " . $column . " = ?";
+                        $params[] = $value;
+                        break;
+                    case '!=':
+                        $query .= " AND " . $column . " != ?";
+                        $params[] = $value;
+                        break;
+                    case 'IN':
+                        $placeholders = implode(',', array_fill(0, count($value), '?'));
+                        $query .= " AND " . $column . " IN ($placeholders)";
+                        $params = array_merge($params, $value);
+                        break;
+                    case 'NOT IN':
+                        $placeholders = implode(',', array_fill(0, count($value), '?'));
+                        $query .= " AND " . $column . " NOT IN ($placeholders)";
+                        $params = array_merge($params, $value);
+                        break;
+                    case 'BETWEEN':
+                        $query .= " AND " . $column . " BETWEEN ? AND ?";
+                        $params[] = $value[0];
+                        $params[] = $value[1];
+                        break;
+                    case 'IS NULL':
+                        $query .= " AND " . $column . " IS NULL";
+                        break;
+                    case 'IS NOT NULL':
+                        $query .= " AND " . $column . " IS NOT NULL";
+                        break;
+                    default:
+                        throw new Exception('Operador no soportado: ' . $operator);
+                }
+            }
         }
-
         try {
             // Ejecutar la consulta con parámetros
             $stmt = $db->execute($query, $params);
