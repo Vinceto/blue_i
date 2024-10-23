@@ -145,7 +145,8 @@ class MetadatosController extends AppController
                 $this->Flash->success(__('Se encontraron ' . count($listadoMetadatos) . ' grupos y sus metadatos'));
                 
                 // Cargar el modelo de IdemGroup usando fetchTable o TableRegistry
-                $this->IdiemGroup = $this->fetchTable('IdiemGroup'); // Alternativa: TableRegistry::getTableLocator()->get('IdiemGroup');
+                $this->IdiemGroup = $this->fetchTable('IdiemGroup');
+                //$this->IdiemService = $this->fetchTable('IdiemService');//aun no hago nada con esto debe llamarse cuando obtenga los servicios
                 $this->SelectValues = $this->fetchTable('SelectValues');
 
                 // Aquí recorremos el array de metadatos encontrados e insertamos en el modelo Metadatos
@@ -186,9 +187,12 @@ class MetadatosController extends AppController
 
                         if (!$existingMetadato) {
                             //si la opcion label es un array, crear la relacion con SelecValues
+                            $select_values_Id = null;
                             if(is_array($label)){
-                                //var_dump($label);
                                 foreach ($label as $keyLabel => $labelValue) {
+                                    if($keyLabel == '' && empty($labelValue)){
+                                        break;
+                                    }
                                     $existingSelectValues = $this->SelectValues->find()
                                         ->where(['select_key' => $keyLabel, 'select_value' => $labelValue]) // Usamos el ID numérico
                                         ->first();
@@ -200,10 +204,14 @@ class MetadatosController extends AppController
                                         ]);
 
                                         // Intentar guardar el SelectValues en la base de datos
-                                        if (!$this->SelectValues->save($selectValuesEntity)) {
+                                        if ($this->SelectValues->save($selectValuesEntity)) {
+                                            $select_values_Id = $selectValuesEntity->id;
+                                        }else{
                                             $this->Flash->error(__('No se pudo guardar el SelectValues: ' . $name));
+                                            continue;
                                         }
                                     }else{
+                                        $select_values_Id = $existingSelectValues->id;
                                         //$this->Flash->info(__('El SelectedValue "' . $labelValue . '" ya existe y no fue insertado.'));
                                     }
                                 }
@@ -212,11 +220,12 @@ class MetadatosController extends AppController
                             // Si no existe, crear una nueva entidad Metadato
                             $metadatoEntity = $this->Metadatos->newEntity([
                                 'name'       => $name,
-                                //'label'      => $label,
                                 'label'      => (is_array($label)) ? $name : $label,
                                 'group_id'   => $groupId, // Asignar el ID numérico del grupo
                                 'service_id' => null, // Si es necesario, puedes asignar otro valor aquí
                                 'tag'        => (is_array($label)) ? 'SELECT' : 'INPUT', // Puedes adaptar esto según tu lógica
+                                'format_date' => null,
+                                'select_data' => $select_values_Id,
                                 'visibility' => true, // Valor por defecto, puede cambiar según la lógica
                                 'is_required' => false, // Valor por defecto, puede cambiar según la lógica
                                 'created_at' => date('Y-m-d H:i:s')

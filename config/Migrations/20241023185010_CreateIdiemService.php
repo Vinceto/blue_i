@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 use Migrations\AbstractMigration;
 
-class CreateIdiemGroup extends AbstractMigration
+class CreateIdiemService extends AbstractMigration
 {
     /**
      * Change Method.
@@ -14,15 +14,19 @@ class CreateIdiemGroup extends AbstractMigration
      */
     public function change(): void
     {
-        $table = $this->table('idiem_group');
-        $table->addColumn('valor', 'string', [
+        $table = $this->table('idiem_service');
+        $table->addColumn('service_key', 'string', [
             'default' => null,
             'limit' => 255,
             'null' => false,
-            'comment' => 'Nombre compuesto para el grupo'
+            'comment' => 'Key del servicio'
         ]);
-        $table  ->addPrimaryKey(['id'])
-                ->addIndex(['valor'], ['unique' => true]);
+        $table->addColumn('service_value', 'string', [
+            'default' => null,
+            'limit' => 255,
+            'null' => false,
+            'comment' => 'Value del servicio'
+        ]);
         $table->create();
     }
 }

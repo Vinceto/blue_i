@@ -19,12 +19,16 @@ class CreateSelectValues extends AbstractMigration
             'default' => null,
             'limit' => 255,
             'null' => false,
+            'comment' => 'Key del Select'
         ]);
         $table->addColumn('select_value', 'string', [
             'default' => null,
             'limit' => 255,
             'null' => false,
+            'comment' => 'Value del Select'
         ]);
+        $table  ->addPrimaryKey(['id'])
+                ->addIndex(['select_value'], ['unique' => true]);
         $table->create();
     }
 }
